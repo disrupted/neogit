@@ -179,7 +179,7 @@ function M.autosquash(popup)
   end
 
   if base then
-    git.rebase.rebase_interactive(base, args)
+    git.rebase.instantly(base, args)
   end
 end
 
