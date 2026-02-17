@@ -16,11 +16,17 @@ end
 ---@param args? string[] list of arguments to pass to git rebase
 ---@return ProcessResult
 function M.instantly(commit, args)
-  local result = git.cli.rebase.interactive.autostash.autosquash
-    .commit(commit)
+  args = args or {}
+
+  local cmd = git.cli.rebase.interactive.autostash.autosquash
     .env({ GIT_SEQUENCE_EDITOR = ":", GIT_EDITOR = ":" })
-    .arg_list(args or {})
-    .call { long = true, pty = true }
+    .arg_list(args)
+
+  if not vim.tbl_contains(args, "--root") then
+    cmd = cmd.commit(commit)
+  end
+
+  local result = cmd.call { long = true, pty = true }
 
   if result:failure() then
     event.send("Rebase", { commit = commit, status = "failed" })
