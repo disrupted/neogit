@@ -147,6 +147,10 @@ function Buffer:set_extmarks(extmarks)
 end
 
 function Buffer:set_line_highlights(highlights)
+  if vim.b[self.handle] and vim.b[self.handle].neogit_disable_hunk_highlight == true then
+    return
+  end
+
   for _, hl in ipairs(highlights) do
     self:add_line_highlight(unpack(hl))
   end
@@ -871,17 +875,21 @@ function Buffer.create(config)
         local cursor = fn.line(".")
         local start = math.max(context.position.row_start, fn.line("w0"))
         local stop = math.min(context.position.row_end, fn.line("w$"))
+        local disable_hl = vim.b.neogit_disable_hunk_highlight == true
 
         for line = start, stop do
-          local line_hl = ("%s%s"):format(
-            buffer.ui:get_line_highlight(line) or "NeogitDiffContext",
-            line == cursor and "Cursor" or "Highlight"
-          )
+          local is_cursor = line == cursor
+          if is_cursor or not disable_hl then
+            local line_hl = ("%s%s"):format(
+              buffer.ui:get_line_highlight(line) or "NeogitDiffContext",
+              is_cursor and "Cursor" or "Highlight"
+            )
 
-          buffer:add_line_highlight(line - 1, line_hl, {
-            priority = 200,
-            namespace = "ViewContext",
-          })
+            buffer:add_line_highlight(line - 1, line_hl, {
+              priority = 200,
+              namespace = "ViewContext",
+            })
+          end
         end
       end,
     })
