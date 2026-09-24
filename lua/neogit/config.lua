@@ -128,6 +128,8 @@ end
 ---@field kind WindowKind The type of window that should be opened
 ---@field show_staged_diff? boolean Display staged changes in a buffer when committing
 ---@field staged_diff_split_kind? StagedDiffSplitKind Whether to show staged changes in a vertical or horizontal split
+---@field max_staged_diff_files? number Skip the staged diff preview when more than this many files are staged. 0 disables the limit
+---@field max_staged_diff_lines? number Skip the staged diff preview when the staged diff has more changed lines than this. 0 disables the limit
 ---@field spell_check? boolean Enable/Disable spell checking
 
 ---@alias NeogitConfigSignsIcon { [1]: string, [2]: string }
@@ -515,6 +517,11 @@ function M.get_default_values()
       kind = "tab",
       show_staged_diff = true,
       staged_diff_split_kind = "split",
+      -- Skip the staged diff preview when the staged changeset is large, to
+      -- avoid freezing the editor while loading/rendering the entire diff.
+      -- Set either limit to 0 to disable it.
+      max_staged_diff_files = 100,
+      max_staged_diff_lines = 5000,
       spell_check = true,
     },
     commit_select_view = {
@@ -1268,6 +1275,8 @@ function M.validate_config()
     if validate_type(config.commit_editor, "commit_editor", "table") then
       validate_type(config.commit_editor.show_staged_diff, "show_staged_diff", "boolean")
       validate_type(config.commit_editor.spell_check, "spell_check", "boolean")
+      validate_type(config.commit_editor.max_staged_diff_files, "max_staged_diff_files", "number")
+      validate_type(config.commit_editor.max_staged_diff_lines, "max_staged_diff_lines", "number")
       validate_kind(config.commit_editor.kind, "commit_editor")
     end
     -- Commit Select View

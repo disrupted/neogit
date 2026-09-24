@@ -42,6 +42,8 @@ local sha256 = vim.fn.sha256
 ---@class DiffStagedStats
 ---@field summary string
 ---@field files DiffStagedStatsFile
+---@field file_count number
+---@field total_changes number
 ---
 ---@class DiffStagedStatsFile
 ---@field path string|nil
@@ -413,9 +415,24 @@ local function staged_stats()
     end
   end
 
+  local total_changes = 0
+
+  if summary then
+    local stats = parse_diff_stats(summary)
+    total_changes = stats.additions + stats.deletions
+  end
+
+  if total_changes == 0 then
+    for _, file in ipairs(files) do
+      total_changes = total_changes + (tonumber(file.changes or "") or 0)
+    end
+  end
+
   return {
     summary = summary,
     files = files,
+    file_count = #files,
+    total_changes = total_changes,
   }
 end
 

@@ -283,6 +283,11 @@ neogit.setup {
     -- "vsplit_left" like :vsplit, but open to the left
     -- "auto" "vsplit" if window would have 80 cols, otherwise "split"
     staged_diff_split_kind = "split",
+    -- Skip the staged diff preview when the staged changeset is large, to avoid
+    -- freezing the editor while loading/rendering the entire diff.
+    -- Set either limit to 0 to disable it.
+    max_staged_diff_files = 100,
+    max_staged_diff_lines = 5000,
     spell_check = true,
   },
   commit_select_view = {

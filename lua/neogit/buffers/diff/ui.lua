@@ -37,4 +37,27 @@ function M.DiffView(header, stats, diffs)
     col(map(diffs, Diff), { tag = "DiffList" }),
   }
 end
+
+--- A lightweight stand-in for `DiffView` used when the staged changeset is too
+--- large to load and render without freezing. Shows the cheap stats summary and
+--- offers a hint to force-load the full diff.
+function M.DiffViewPlaceholder(header, stats)
+  return {
+    text.highlight("NeogitFloatHeaderHighlight")(header),
+    text(stats.summary or ""),
+    EmptyLine(),
+    text.highlight("NeogitDiffDeletions")("Staged changes are too large to display."),
+    text(
+      ("Skipped the diff preview to avoid freezing the editor (%d file%s, %d changed line%s)."):format(
+        stats.file_count or 0,
+        (stats.file_count or 0) == 1 and "" or "s",
+        stats.total_changes or 0,
+        (stats.total_changes or 0) == 1 and "" or "s"
+      )
+    ),
+    EmptyLine(),
+    text("Press <cr> to load the full diff anyway."),
+    text("See :help neogit-configuration for max_staged_diff_files / max_staged_diff_lines."),
+  }
+end
 return M

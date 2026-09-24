@@ -121,6 +121,16 @@ describe("Neogit config", function()
         assert.True(vim.tbl_count(require("neogit.config").validate_config()) ~= 0)
       end)
 
+      it("should return invalid when commit_editor.max_staged_diff_files isn't a number", function()
+        config.values.commit_editor.max_staged_diff_files = "not a number"
+        assert.True(vim.tbl_count(require("neogit.config").validate_config()) ~= 0)
+      end)
+
+      it("should return invalid when commit_editor.max_staged_diff_lines isn't a number", function()
+        config.values.commit_editor.max_staged_diff_lines = "not a number"
+        assert.True(vim.tbl_count(require("neogit.config").validate_config()) ~= 0)
+      end)
+
       it("should return invalid when commit_select_view isn't a table", function()
         config.values.commit_select_view = "not a table"
         assert.True(vim.tbl_count(require("neogit.config").validate_config()) ~= 0)
@@ -511,6 +521,12 @@ describe("Neogit config", function()
 
       it("should return valid when commit_editor.kind is a valid window kind", function()
         config.values.commit_editor.kind = "replace"
+        assert.True(vim.tbl_count(require("neogit.config").validate_config()) == 0)
+      end)
+
+      it("should return valid when commit_editor max diff limits are numbers", function()
+        config.values.commit_editor.max_staged_diff_files = 0
+        config.values.commit_editor.max_staged_diff_lines = 10
         assert.True(vim.tbl_count(require("neogit.config").validate_config()) == 0)
       end)
 
